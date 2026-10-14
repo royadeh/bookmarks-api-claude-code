@@ -1,0 +1,19 @@
+[project]
+name = "bookmarks-api"
+version = "0.1.0"
+description = "FastAPI + SQLite service for saving and searching bookmarks."
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "httpx",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
