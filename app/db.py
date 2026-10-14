@@ -1,4 +1,7 @@
 import sqlite3
+from collections.abc import Iterator
+
+from app.config import get_db_path
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS bookmarks (
@@ -24,7 +27,7 @@ CREATE INDEX IF NOT EXISTS idx_bookmark_tags_tag_id ON bookmark_tags (tag_id);
 
 
 def connect(db_path: str) -> sqlite3.Connection:
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
@@ -33,3 +36,11 @@ def connect(db_path: str) -> sqlite3.Connection:
 def init_schema(conn: sqlite3.Connection) -> None:
     conn.executescript(SCHEMA)
     conn.commit()
+
+
+def get_connection() -> Iterator[sqlite3.Connection]:
+    conn = connect(get_db_path())
+    try:
+        yield conn
+    finally:
+        conn.close()
