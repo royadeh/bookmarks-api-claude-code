@@ -3,6 +3,10 @@ from pydantic import BaseModel, field_validator
 from app.urls import normalize_url
 
 
+def normalize_tag(tag: str) -> str:
+    return tag.strip().lower()
+
+
 class BookmarkCreate(BaseModel):
     url: str
     title: str | None = None
@@ -16,7 +20,7 @@ class BookmarkCreate(BaseModel):
     @field_validator("tags")
     @classmethod
     def _normalize_tags(cls, value: list[str]) -> list[str]:
-        cleaned = (tag.strip().lower() for tag in value)
+        cleaned = (normalize_tag(tag) for tag in value)
         return list(dict.fromkeys(tag for tag in cleaned if tag))
 
 

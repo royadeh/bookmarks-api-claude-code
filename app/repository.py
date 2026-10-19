@@ -42,11 +42,19 @@ def _link_tag(conn: sqlite3.Connection, bookmark_id: int, name: str) -> None:
     )
 
 
-def list_bookmarks(conn: sqlite3.Connection) -> list[BookmarkOut]:
-    rows = conn.execute(
-        "SELECT id, url, title, created_at FROM bookmarks "
-        "ORDER BY created_at DESC, id DESC"
-    ).fetchall()
+LIST_SQL = "SELECT id, url, title, created_at FROM bookmarks"
+TAG_FILTER_SQL = (
+    " WHERE id IN (SELECT bt.bookmark_id FROM bookmark_tags bt"
+    " JOIN tags t ON t.id = bt.tag_id WHERE t.name = ?)"
+)
+NEWEST_FIRST_SQL = " ORDER BY created_at DESC, id DESC"
+
+
+def list_bookmarks(conn: sqlite3.Connection, tag: str | None = None) -> list[BookmarkOut]:
+    if tag is None:
+        rows = conn.execute(LIST_SQL + NEWEST_FIRST_SQL).fetchall()
+    else:
+        rows = conn.execute(LIST_SQL + TAG_FILTER_SQL + NEWEST_FIRST_SQL, (tag,)).fetchall()
     tags = _tags_by_bookmark(conn)
     return [BookmarkOut(**dict(row), tags=tags.get(row["id"], [])) for row in rows]
 
