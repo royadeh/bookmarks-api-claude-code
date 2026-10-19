@@ -51,20 +51,35 @@ Each test uses its own temporary database, so tests never touch `bookmarks.db`.
 ## Project structure
 
 ```
-app/
-  main.py              create_app(), startup schema creation, error handlers
-  config.py            reads BOOKMARKS_DB_PATH
-  db.py                SQLite schema and connections
-  errors.py            X-Request-ID middleware and generic 500 handler
-  schemas.py           request/response models, tag normalization
-  urls.py              URL validation and normalization
-  repository.py        SQL for create, list, filter and delete
-  routes/bookmarks.py  /bookmarks endpoints
-tests/                 pytest suite, one file per feature
-pyproject.toml         dependencies and pytest settings
-.env.example           documented environment variables
+bookmarks-api-claude-code/
+├── app/
+│   ├── main.py               App setup, startup, error handlers
+│   ├── routes/
+│   │   └── bookmarks.py      The /bookmarks endpoints (HTTP only)
+│   ├── schemas.py            Request/response models, tag cleanup
+│   ├── urls.py               URL validation and normalization
+│   ├── repository.py         All SQL: create, list, filter, delete
+│   ├── db.py                 SQLite schema and connections
+│   ├── config.py             Reads BOOKMARKS_DB_PATH
+│   └── errors.py             X-Request-ID and generic 500 handler
+├── tests/                    pytest suite, one file per feature
+├── CLAUDE.md                 Rules I give Claude Code
+├── pyproject.toml            Dependencies and pytest settings
+└── .env.example              Documented environment variables
 ```
 
+### How a request flows
+
+```mermaid
+flowchart LR
+    A["Client request"] --> B["main.py: request ID, error handling"]
+    B --> C["routes/bookmarks.py: HTTP handlers"]
+    C --> D["schemas.py and urls.py: validate and clean input"]
+    C --> E["repository.py: SQL queries"]
+    E --> F[("SQLite via db.py")]
+```
+
+Routes handle HTTP, schemas and urls validate input, and the repository talks to the database. Each file has one job.
 
 ## How I built this
 
