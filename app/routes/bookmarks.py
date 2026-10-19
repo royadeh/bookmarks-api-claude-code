@@ -1,6 +1,6 @@
 import sqlite3
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.db import get_connection
 from app.repository import DuplicateURLError, insert_bookmark, list_bookmarks
@@ -21,8 +21,12 @@ def create_bookmark(
 
 @router.get("")
 def get_bookmarks(
-    tag: str | None = None, conn: sqlite3.Connection = Depends(get_connection)
+    request: Request,
+    tag: str | None = None,
+    conn: sqlite3.Connection = Depends(get_connection),
 ) -> list[BookmarkOut]:
+    if len(request.query_params.getlist("tag")) > 1:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Only one tag is allowed")
     if tag is None:
         return list_bookmarks(conn)
     normalized = normalize_tag(tag)

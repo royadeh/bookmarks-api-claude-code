@@ -73,3 +73,18 @@ def test_blank_tag_returns_422(client: TestClient) -> None:
     response = client.get("/bookmarks", params={"tag": "   "})
 
     assert response.status_code == 422
+
+
+def test_repeated_tag_parameter_returns_422(client: TestClient) -> None:
+    create(client, "https://example.com", ["python"])
+
+    response = client.get("/bookmarks?tag=python&tag=secret-value")
+
+    assert response.status_code == 422
+    assert "secret-value" not in response.text
+
+
+def test_same_tag_repeated_returns_422(client: TestClient) -> None:
+    response = client.get("/bookmarks?tag=python&tag=python")
+
+    assert response.status_code == 422
