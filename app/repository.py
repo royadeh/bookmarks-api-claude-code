@@ -40,3 +40,23 @@ def _link_tag(conn: sqlite3.Connection, bookmark_id: int, name: str) -> None:
         "SELECT ?, id FROM tags WHERE name = ?",
         (bookmark_id, name),
     )
+
+
+def list_bookmarks(conn: sqlite3.Connection) -> list[BookmarkOut]:
+    rows = conn.execute(
+        "SELECT id, url, title, created_at FROM bookmarks "
+        "ORDER BY created_at DESC, id DESC"
+    ).fetchall()
+    tags = _tags_by_bookmark(conn)
+    return [BookmarkOut(**dict(row), tags=tags.get(row["id"], [])) for row in rows]
+
+
+def _tags_by_bookmark(conn: sqlite3.Connection) -> dict[int, list[str]]:
+    rows = conn.execute(
+        "SELECT bt.bookmark_id, t.name FROM bookmark_tags bt "
+        "JOIN tags t ON t.id = bt.tag_id ORDER BY bt.rowid"
+    )
+    tags: dict[int, list[str]] = {}
+    for bookmark_id, name in rows:
+        tags.setdefault(bookmark_id, []).append(name)
+    return tags
