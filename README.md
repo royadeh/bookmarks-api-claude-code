@@ -85,7 +85,7 @@ Routes handle HTTP, schemas and urls validate input, and the repository talks to
 
 ## How I built this
 
-I built this over 2 days as a practice project for working with Claude Code. I used a test-first workflow with one small step at a time, and I reviewed everything before it reached `main`. The repo ends with 78 tests across 4 pull requests.
+I used a test-first workflow with one small step at a time, and I reviewed everything before it reached `main`. The repo ends with 78 tests across 4 pull requests.
 
 ### How I worked with Claude Code
 
