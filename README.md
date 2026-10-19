@@ -1,5 +1,7 @@
 # Bookmarks API
 
+[![tests](https://github.com/royadeh/bookmarks-api-claude-code/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/royadeh/bookmarks-api-claude-code/actions/workflows/tests.yml)
+
 A small FastAPI service for saving bookmarks, listing them, filtering them by tag and deleting them.
 Data is stored in a local SQLite database.
 
