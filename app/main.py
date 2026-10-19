@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import get_db_path
 from app.db import connect, init_schema
+from app.errors import internal_error_handler, request_id_middleware
 from app.routes import bookmarks
 
 
@@ -27,6 +28,8 @@ async def validation_error_handler(_: Request, error: Exception) -> JSONResponse
 def create_app() -> FastAPI:
     application = FastAPI(title="Bookmarks API",lifespan=lifespan)
     application.add_exception_handler(RequestValidationError, validation_error_handler)
+    application.add_exception_handler(Exception, internal_error_handler)
+    application.middleware("http")(request_id_middleware)
     application.include_router(bookmarks.router)
 
     @application.get("/health")
