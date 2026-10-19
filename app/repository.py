@@ -68,3 +68,9 @@ def _tags_by_bookmark(conn: sqlite3.Connection) -> dict[int, list[str]]:
     for bookmark_id, name in rows:
         tags.setdefault(bookmark_id, []).append(name)
     return tags
+
+
+def delete_bookmark(conn: sqlite3.Connection, bookmark_id: int) -> bool:
+    with conn:
+        cursor = conn.execute("DELETE FROM bookmarks WHERE id = ?", (bookmark_id,))
+    return cursor.rowcount > 0
